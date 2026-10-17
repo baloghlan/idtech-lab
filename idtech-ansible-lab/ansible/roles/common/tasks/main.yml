@@ -1,0 +1,21 @@
+- name: Install common packages
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  loop: "{{ common_packages }}"
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Create managed group
+  ansible.builtin.group:
+    name: "{{ managed_group }}"
+    state: present
+
+- name: Create managed user
+  ansible.builtin.user:
+    name: "{{ managed_user }}"
+    group: "{{ managed_group }}"
+    shell: /bin/bash
+    create_home: true
+    state: present

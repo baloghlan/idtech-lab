@@ -1,0 +1,4 @@
+control_project_dir: /opt/idtech-ansible
+control_packages:
+  - tree
+  - jq
