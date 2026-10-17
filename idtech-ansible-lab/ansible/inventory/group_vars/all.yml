@@ -1,0 +1,8 @@
+common_packages:
+  - curl
+  - wget
+  - vim
+  - htop
+
+managed_group: idtech
+managed_user: idtech

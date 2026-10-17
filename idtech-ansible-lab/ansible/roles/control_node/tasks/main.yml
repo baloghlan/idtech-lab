@@ -1,0 +1,27 @@
+- name: Create control node project directory
+  ansible.builtin.file:
+    path: "{{ control_project_dir }}"
+    state: directory
+    owner: "{{ managed_user }}"
+    group: "{{ managed_group }}"
+    mode: "0755"
+
+- name: Install control node utilities
+  ansible.builtin.apt:
+    name: "{{ control_packages }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Create control node management file
+  ansible.builtin.copy:
+    dest: "{{ control_project_dir }}/node-info.txt"
+    content: |
+      Managed by Ansible
+      Hostname: {{ ansible_facts['hostname'] }}
+      Operating System: {{ ansible_facts['distribution'] }}
+      OS Version: {{ ansible_facts['distribution_version'] }}
+    owner: "{{ managed_user }}"
+    group: "{{ managed_group }}"
+    mode: "0644"

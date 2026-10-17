@@ -1,0 +1,10 @@
+backend_port: 8080
+backend_bind_address: 127.0.0.1
+backend_service_name: idtech-backend
+backend_user: idtech-backend
+backend_app_dir: /opt/idtech-backend
+
+haproxy_frontend_port: 80
+haproxy_backend_address: 127.0.0.1
+
+backend_message: "Hello from IDTECH Academy!"

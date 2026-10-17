@@ -1,0 +1,56 @@
+- name: Install HAProxy
+  ansible.builtin.apt:
+    name: haproxy
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Deploy HAProxy configuration safely
+  block:
+    - name: Render candidate HAProxy configuration
+      ansible.builtin.template:
+        src: haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg.candidate
+        owner: root
+        group: root
+        mode: "0644"
+      changed_when: false
+
+    - name: Validate candidate HAProxy configuration
+      ansible.builtin.command:
+        cmd: haproxy -c -f /etc/haproxy/haproxy.cfg.candidate
+      register: haproxy_validation
+      changed_when: false
+
+    - name: Activate validated HAProxy configuration
+      ansible.builtin.copy:
+        src: /etc/haproxy/haproxy.cfg.candidate
+        dest: /etc/haproxy/haproxy.cfg
+        remote_src: true
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload HAProxy
+
+  rescue:
+    - name: Report HAProxy configuration failure
+      ansible.builtin.debug:
+        msg: "HAProxy validation failed. Existing configuration remains unchanged."
+
+    - name: Fail deployment safely
+      ansible.builtin.fail:
+        msg: "HAProxy configuration was rejected. Previous working configuration preserved."
+
+  always:
+    - name: Remove candidate HAProxy configuration
+      ansible.builtin.file:
+        path: /etc/haproxy/haproxy.cfg.candidate
+        state: absent
+      changed_when: false
+
+- name: Enable and start HAProxy
+  ansible.builtin.systemd:
+    name: haproxy
+    enabled: true
+    state: started

@@ -1,0 +1,22 @@
+[Unit]
+Description=IDTECH Academy HTTP Backend
+After=network.target
+
+[Service]
+Type=simple
+User={{ backend_user }}
+Group={{ backend_user }}
+WorkingDirectory={{ backend_app_dir }}
+
+Environment="BACKEND_HOST={{ backend_bind_address }}"
+Environment="BACKEND_PORT={{ backend_port }}"
+Environment="BACKEND_MESSAGE={{ backend_message }}"
+
+ExecStart=/usr/bin/python3 {{ backend_app_dir }}/server.py
+Restart=on-failure
+RestartSec=3
+
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
