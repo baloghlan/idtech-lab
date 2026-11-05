@@ -1,0 +1,51 @@
+- name: Create registry data directory
+  ansible.builtin.file:
+    path: "{{ registry_data_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Download nerdctl archive
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/containerd/nerdctl/releases/download/v{{ nerdctl_version }}/nerdctl-{{ nerdctl_version }}-linux-{{ nerdctl_arch }}.tar.gz
+    dest: "/tmp/nerdctl-{{ nerdctl_version }}.tar.gz"
+    mode: "0644"
+
+- name: Install nerdctl
+  ansible.builtin.unarchive:
+    src: "/tmp/nerdctl-{{ nerdctl_version }}.tar.gz"
+    dest: /usr/local/bin
+    remote_src: true
+    include:
+      - nerdctl
+    creates: /usr/local/bin/nerdctl
+
+- name: Install registry systemd service
+  ansible.builtin.template:
+    src: idtech-registry.service.j2
+    dest: /etc/systemd/system/idtech-registry.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart registry
+
+- name: Enable and start registry
+  ansible.builtin.systemd_service:
+    name: idtech-registry
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Apply registry service changes
+  ansible.builtin.meta: flush_handlers
+
+- name: Wait for registry API
+  ansible.builtin.uri:
+    url: "http://{{ registry_host }}:{{ registry_port }}/v2/"
+    status_code: 200
+  register: registry_health
+  retries: 15
+  delay: 3
+  until: registry_health.status == 200
