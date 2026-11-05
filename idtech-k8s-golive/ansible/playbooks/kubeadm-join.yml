@@ -1,0 +1,44 @@
+- name: Check Kubernetes worker membership
+  hosts: k8s_workers
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Check whether worker is already joined
+      ansible.builtin.stat:
+        path: /etc/kubernetes/kubelet.conf
+      register: kubelet_config
+
+- name: Generate Kubernetes join command
+  hosts: k8s_master
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Generate join command when workers need joining
+      ansible.builtin.command:
+        cmd: kubeadm token create --print-join-command
+      register: kubeadm_join_command
+      when: >-
+        groups['k8s_workers']
+        | map('extract', hostvars, 'kubelet_config')
+        | selectattr('stat.exists', 'equalto', false)
+        | list
+        | length > 0
+      changed_when: true
+      no_log: true
+
+- name: Join Kubernetes workers
+  hosts: k8s_workers
+  become: true
+  gather_facts: false
+  serial: 1
+
+  tasks:
+    - name: Join worker to cluster
+      ansible.builtin.command:
+        cmd: >-
+          {{ hostvars[groups['k8s_master'][0]].kubeadm_join_command.stdout }}
+          --cri-socket unix:///run/containerd/containerd.sock
+      when: not kubelet_config.stat.exists
+      no_log: true

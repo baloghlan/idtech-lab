@@ -1,0 +1,38 @@
+- name: Configure Kubernetes node scheduling
+  hosts: k8s_master
+  become: true
+  gather_facts: false
+
+  vars:
+    ansible_python_interpreter: /opt/ansible-k8s-venv/bin/python
+    kubeconfig_path: /etc/kubernetes/admin.conf
+
+  tasks:
+    - name: Configure frontend worker
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition:
+          apiVersion: v1
+          kind: Node
+          metadata:
+            name: worker1
+            labels:
+              tier: frontend
+          spec:
+            taints:
+              - key: app
+                value: frontend
+                effect: NoSchedule
+
+    - name: Configure backend worker
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition:
+          apiVersion: v1
+          kind: Node
+          metadata:
+            name: worker2
+            labels:
+              tier: backend
