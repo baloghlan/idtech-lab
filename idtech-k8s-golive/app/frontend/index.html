@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IDTECH Kubernetes Lab</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 700px;
+      margin: 80px auto;
+      padding: 24px;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
+    .card {
+      background: white;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px #00000010;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: 0;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    pre {
+      background: #f1f5f9;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>IDTECH Kubernetes Lab</h1>
+    <p>Frontend: Nginx | Backend: Flask | Database: Redis</p>
+
+    <button onclick="getVisits()">Visit API</button>
+
+    <h3>API Response</h3>
+    <pre id="result">Click the button to send a request.</pre>
+  </div>
+
+  <script>
+    async function getVisits() {
+      const result = document.getElementById("result");
+
+      try {
+        const response = await fetch("/api/visits");
+        const data = await response.json();
+
+        result.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        result.textContent = error.message;
+      }
+    }
+  </script>
+</body>
+</html>

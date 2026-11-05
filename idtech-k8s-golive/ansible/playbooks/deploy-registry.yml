@@ -1,0 +1,7 @@
+- name: Deploy local container registry
+  hosts: k8s_master
+  become: true
+  gather_facts: false
+
+  roles:
+    - registry

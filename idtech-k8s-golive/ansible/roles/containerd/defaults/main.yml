@@ -1,3 +1,2 @@
-#SPDX-License-Identifier: MIT-0
----
-# defaults file for roles/containerd
+registry_host: "192.168.56.10"
+registry_port: 5000

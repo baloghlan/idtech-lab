@@ -1,0 +1,27 @@
+[Unit]
+Description=IDTECH Local Container Registry
+Requires=containerd.service
+After=containerd.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+
+ExecStartPre=-/usr/local/bin/nerdctl --namespace idtech rm -f {{ registry_container_name }}
+
+ExecStart=/usr/local/bin/nerdctl \
+  --namespace idtech \
+  run --rm \
+  --net=host \
+  --name {{ registry_container_name }} \
+  --env REGISTRY_HTTP_ADDR={{ registry_host }}:{{ registry_port }} \
+  --volume {{ registry_data_dir }}:/var/lib/registry \
+  {{ registry_image }}
+
+ExecStop=/usr/local/bin/nerdctl --namespace idtech stop {{ registry_container_name }}
+
+[Install]
+WantedBy=multi-user.target

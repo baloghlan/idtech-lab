@@ -1,0 +1,8 @@
+registry_host: "192.168.56.10"
+registry_port: 5000
+registry_image: "registry:2"
+registry_container_name: "idtech-registry"
+registry_data_dir: "/opt/idtech-registry/data"
+
+nerdctl_version: "2.1.3"
+nerdctl_arch: "amd64"

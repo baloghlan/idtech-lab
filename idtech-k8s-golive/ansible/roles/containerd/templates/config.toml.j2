@@ -11,3 +11,6 @@ version = 3
 
       [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.runc.options]
         SystemdCgroup = true
+
+[plugins."io.containerd.cri.v1.images"]
+  config_path = "/etc/containerd/certs.d"
