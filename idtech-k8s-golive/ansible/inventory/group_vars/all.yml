@@ -1,0 +1,14 @@
+ansible_user: ubuntu
+
+kubernetes_version: "1.37"
+pod_network_cidr: "10.244.0.0/16"
+
+k8s_master_ip: "192.168.56.10"
+
+k8s_nodes:
+  - name: master
+    ip: "192.168.56.10"
+  - name: worker1
+    ip: "192.168.56.11"
+  - name: worker2
+    ip: "192.168.56.12"

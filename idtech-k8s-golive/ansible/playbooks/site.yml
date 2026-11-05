@@ -1,0 +1,11 @@
+- import_playbook: prepare-nodes.yml
+
+- import_playbook: kubeadm-init.yml
+
+- import_playbook: install-cni.yml
+
+- import_playbook: kubeadm-join.yml
+
+- import_playbook: bootstrap.yml
+
+- import_playbook: configure-nodes.yml

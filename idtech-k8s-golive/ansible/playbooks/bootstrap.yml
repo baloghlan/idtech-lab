@@ -1,0 +1,28 @@
+---
+- name: Prepare Kubernetes Python environment
+  hosts: k8s_master
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Install Python virtual environment prerequisites
+      ansible.builtin.apt:
+        name:
+          - python3-venv
+          - python3-pip
+        state: present
+        update_cache: true
+
+    - name: Create Kubernetes Python virtual environment
+      ansible.builtin.command:
+        cmd: python3 -m venv /opt/ansible-k8s-venv
+        creates: /opt/ansible-k8s-venv/bin/python
+
+    - name: Install Kubernetes Python dependencies
+      ansible.builtin.pip:
+        name:
+          - kubernetes
+          - PyYAML
+          - jsonpatch
+        virtualenv: /opt/ansible-k8s-venv
+        state: present

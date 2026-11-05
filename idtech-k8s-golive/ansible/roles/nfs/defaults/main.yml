@@ -1,0 +1,2 @@
+nfs_export_path: /srv/nfs/k8s
+nfs_allowed_network: 192.168.56.0/24

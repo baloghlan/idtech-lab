@@ -1,0 +1,7 @@
+- name: Configure NFS server
+  ansible.builtin.import_tasks: server.yml
+  when: "'k8s_master' in group_names"
+
+- name: Configure NFS clients
+  ansible.builtin.import_tasks: client.yml
+  when: "'k8s_workers' in group_names"

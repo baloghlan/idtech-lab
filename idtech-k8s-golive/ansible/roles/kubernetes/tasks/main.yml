@@ -1,0 +1,74 @@
+- name: Install Kubernetes repository dependencies
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gpg
+      - python3-debian
+    state: present
+    update_cache: true
+
+- name: Create APT keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Check Kubernetes GPG keyring
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+  register: kubernetes_gpg_keyring
+
+- name: Download Kubernetes repository signing key
+  ansible.builtin.get_url:
+    url: "https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/deb/Release.key"
+    dest: /etc/apt/keyrings/kubernetes-release.key
+    mode: "0644"
+  register: kubernetes_key
+
+- name: Convert Kubernetes signing key to GPG keyring
+  ansible.builtin.command:
+    cmd: gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /etc/apt/keyrings/kubernetes-release.key
+  when: kubernetes_key.changed or not kubernetes_gpg_keyring.stat.exists
+  changed_when: true
+
+- name: Configure Kubernetes APT repository
+  ansible.builtin.deb822_repository:
+    name: kubernetes
+    types:
+      - deb
+    uris:
+      - "https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/deb/"
+    suites:
+      - "/"
+    signed_by: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    state: present
+    enabled: true
+  register: kubernetes_repository
+
+- name: Update APT cache after repository configuration
+  ansible.builtin.apt:
+    update_cache: true
+  when: kubernetes_repository.changed
+
+- name: Install Kubernetes packages
+  ansible.builtin.apt:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+    state: present
+
+- name: Hold Kubernetes packages
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop:
+    - kubelet
+    - kubeadm
+    - kubectl
+
+- name: Enable kubelet
+  ansible.builtin.systemd_service:
+    name: kubelet
+    enabled: true
