@@ -1,0 +1,33 @@
+- name: Deploy Kubernetes base resources
+  hosts: k8s_master
+  become: true
+  gather_facts: false
+
+  vars:
+    ansible_python_interpreter: /opt/ansible-k8s-venv/bin/python
+    kubeconfig_path: /etc/kubernetes/admin.conf
+    manifests_dir: "{{ playbook_dir }}/../../k8s/base"
+
+  tasks:
+    - name: Create application namespaces
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition: >-
+          {{
+            lookup('file', manifests_dir + '/namespaces.yaml')
+            | from_yaml_all
+            | list
+          }}
+
+    - name: Configure frontend resource quota
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition: "{{ lookup('file', manifests_dir + '/resource-quota.yaml') | from_yaml }}"
+
+    - name: Configure frontend limit range
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition: "{{ lookup('file', manifests_dir + '/limit-range.yaml') | from_yaml }}"
