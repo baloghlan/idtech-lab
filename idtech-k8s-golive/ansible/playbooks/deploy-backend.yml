@@ -7,6 +7,12 @@
     kubeconfig_path: /etc/kubernetes/admin.conf
 
   tasks:
+    - name: Deploy Backend ConfigMap
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition: "{{ lookup('file', '../../k8s/backend/backend-configmap.yaml') | from_yaml }}"
+        
     - name: Deploy Backend Service
       kubernetes.core.k8s:
         state: present
