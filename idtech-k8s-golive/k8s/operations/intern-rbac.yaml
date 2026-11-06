@@ -21,7 +21,7 @@ metadata:
   namespace: idtech-backend
 subjects:
   - kind: User
-    name: intern
+    name: idtech-intern
     apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: Role

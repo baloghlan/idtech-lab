@@ -34,5 +34,5 @@
           openssl req -new
           -key {{ intern_cert_dir }}/intern.key
           -out {{ intern_cert_dir }}/intern.csr
-          -subj /CN=intern
+          -subj /CN=idtech-intern
         creates: "{{ intern_cert_dir }}/intern.csr"
