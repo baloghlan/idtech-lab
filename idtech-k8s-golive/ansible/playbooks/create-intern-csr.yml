@@ -1,0 +1,38 @@
+- name: Create intern certificate signing request
+  hosts: k8s_master
+  become: true
+  gather_facts: false
+
+  vars:
+    intern_cert_dir: /etc/kubernetes/intern
+
+  tasks:
+    - name: Create intern certificate directory
+      ansible.builtin.file:
+        path: "{{ intern_cert_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0700"
+
+    - name: Generate intern private key
+      ansible.builtin.command:
+        cmd: openssl genrsa -out {{ intern_cert_dir }}/intern.key 2048
+        creates: "{{ intern_cert_dir }}/intern.key"
+      no_log: true
+
+    - name: Restrict private key permissions
+      ansible.builtin.file:
+        path: "{{ intern_cert_dir }}/intern.key"
+        owner: root
+        group: root
+        mode: "0600"
+
+    - name: Generate intern CSR
+      ansible.builtin.command:
+        cmd: >-
+          openssl req -new
+          -key {{ intern_cert_dir }}/intern.key
+          -out {{ intern_cert_dir }}/intern.csr
+          -subj /CN=intern
+        creates: "{{ intern_cert_dir }}/intern.csr"

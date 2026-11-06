@@ -1,0 +1,56 @@
+- name: Submit and approve intern Kubernetes CSR
+  hosts: k8s_master
+  become: true
+  gather_facts: false
+
+  vars:
+    ansible_python_interpreter: /opt/ansible-k8s-venv/bin/python
+    kubeconfig_path: /etc/kubernetes/admin.conf
+    intern_cert_dir: /etc/kubernetes/intern
+    intern_csr_name: intern-client
+
+  tasks:
+    - name: Read intern CSR
+      ansible.builtin.slurp:
+        src: "{{ intern_cert_dir }}/intern.csr"
+      register: intern_csr
+      no_log: true
+
+    - name: Submit Kubernetes CertificateSigningRequest
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition:
+          apiVersion: certificates.k8s.io/v1
+          kind: CertificateSigningRequest
+          metadata:
+            name: "{{ intern_csr_name }}"
+          spec:
+            request: "{{ intern_csr.content }}"
+            signerName: kubernetes.io/kube-apiserver-client
+            expirationSeconds: 86400
+            usages:
+              - client auth
+
+    - name: Check CSR status
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - --kubeconfig={{ kubeconfig_path }}
+          - get
+          - csr
+          - "{{ intern_csr_name }}"
+          - -o
+          - jsonpath={.status.conditions[?(@.type=="Approved")].type}
+      register: csr_approval
+      changed_when: false
+
+    - name: Approve intern CSR
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - --kubeconfig={{ kubeconfig_path }}
+          - certificate
+          - approve
+          - "{{ intern_csr_name }}"
+      when: csr_approval.stdout != "Approved"

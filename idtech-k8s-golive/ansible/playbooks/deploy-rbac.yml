@@ -1,0 +1,15 @@
+- name: Deploy Kubernetes RBAC
+  hosts: k8s_master
+  become: true
+
+  vars:
+    ansible_python_interpreter: /opt/ansible-k8s-venv/bin/python
+    kubeconfig_path: /etc/kubernetes/admin.conf
+
+  tasks:
+    - name: Deploy intern RBAC resources
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition: "{{ item }}"
+      loop: "{{ lookup('file', '../../k8s/operations/intern-rbac.yaml') | from_yaml_all | list }}"

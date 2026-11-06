@@ -31,3 +31,9 @@
 - import_playbook: install-metrics-server.yml
 
 - import_playbook: deploy-backend-hpa.yml
+
+- import_playbook: deploy-cronjob.yml
+
+- import_playbook: deploy-daemonset.yml
+
+- import_playbook: deploy-rbac.yml
