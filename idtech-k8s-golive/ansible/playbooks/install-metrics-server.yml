@@ -1,0 +1,35 @@
+- name: Install Kubernetes Metrics Server
+  hosts: k8s_master
+  become: true
+
+  vars:
+    kubeconfig_path: /etc/kubernetes/admin.conf
+    metrics_server_chart_version: "3.14.0"
+
+  tasks:
+    - name: Install Metrics Server using Helm
+      kubernetes.core.helm:
+        name: metrics-server
+        chart_ref: metrics-server
+        chart_repo_url: https://kubernetes-sigs.github.io/metrics-server/
+        chart_version: "{{ metrics_server_chart_version }}"
+        release_namespace: kube-system
+        kubeconfig: "{{ kubeconfig_path }}"
+        release_values:
+          replicas: 1
+
+          args:
+            - --kubelet-insecure-tls
+            - --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP
+
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+
+        wait: true
+        timeout: 5m
+        state: present
