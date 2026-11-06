@@ -1,0 +1,23 @@
+replicaCount: 1
+
+nfs:
+  server: 192.168.56.10
+  path: /srv/nfs/k8s
+
+storageClass:
+  create: true
+  name: nfs-idtech
+  defaultClass: false
+  reclaimPolicy: Delete
+  archiveOnDelete: true
+
+nodeSelector:
+  tier: backend
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi

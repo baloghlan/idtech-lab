@@ -1,0 +1,6 @@
+- name: Install kubeseal CLI
+  hosts: k8s_master
+  become: true
+
+  roles:
+    - kubeseal

@@ -13,3 +13,17 @@
 - import_playbook: deploy-base-resources.yml
 
 - import_playbook: deploy-registry.yml
+
+- import_playbook: install-helm.yml
+
+- import_playbook: deploy-nfs-provisioner.yml
+
+- import_playbook: install-sealed-secrets.yml
+
+- import_playbook: install-kubeseal.yml
+
+- import_playbook: deploy-redis.yml
+
+- import_playbook: deploy-backend.yml
+
+- import_playbook: deploy-frontend.yml

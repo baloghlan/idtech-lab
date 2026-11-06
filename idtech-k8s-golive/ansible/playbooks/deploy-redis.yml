@@ -1,0 +1,39 @@
+- name: Deploy Redis
+  hosts: k8s_master
+  become: true
+
+  vars:
+    ansible_python_interpreter: /opt/ansible-k8s-venv/bin/python
+    kubeconfig_path: /etc/kubernetes/admin.conf
+
+  tasks:
+    - name: Deploy Redis SealedSecret
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition: "{{ lookup('file', '../../k8s/backend/redis-sealed-secret.yaml') | from_yaml }}"
+
+    - name: Deploy Redis Headless Service
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition: "{{ lookup('file', '../../k8s/backend/redis-service.yaml') | from_yaml }}"
+
+    - name: Wait for Redis Secret
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Secret
+        name: redis-secret
+        namespace: idtech-backend
+        kubeconfig: "{{ kubeconfig_path }}"
+      register: redis_secret
+      until: redis_secret.resources | length > 0
+      retries: 15
+      delay: 2
+      no_log: true
+
+    - name: Deploy Redis StatefulSet
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition: "{{ lookup('file', '../../k8s/backend/redis-statefulset.yaml') | from_yaml }}"

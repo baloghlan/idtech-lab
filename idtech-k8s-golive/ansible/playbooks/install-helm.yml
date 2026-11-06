@@ -1,0 +1,6 @@
+- name: Install Helm on Kubernetes control plane
+  hosts: k8s_master
+  become: true
+
+  roles:
+    - helm
