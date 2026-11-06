@@ -22,7 +22,11 @@ redis_client = redis.Redis(
 
 @app.get("/health")
 def health():
-    return jsonify(status="ok", version=VERSION)
+    return jsonify(
+        status="ok",
+        version=VERSION,
+        release="rolling-update-demo",
+    )
 
 
 @app.get("/api/visits")
