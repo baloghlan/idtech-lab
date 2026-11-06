@@ -1,0 +1,26 @@
+- name: Deploy Frontend Application
+  hosts: k8s_master
+  become: true
+
+  vars:
+    ansible_python_interpreter: /opt/ansible-k8s-venv/bin/python
+    kubeconfig_path: /etc/kubernetes/admin.conf
+
+  tasks:
+    - name: Deploy Nginx ConfigMap
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition: "{{ lookup('file', '../../k8s/frontend/nginx-configmap.yaml') | from_yaml }}"
+
+    - name: Deploy Frontend Service
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition: "{{ lookup('file', '../../k8s/frontend/frontend-service.yaml') | from_yaml }}"
+
+    - name: Deploy Frontend
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition: "{{ lookup('file', '../../k8s/frontend/frontend-deployment.yaml') | from_yaml }}"

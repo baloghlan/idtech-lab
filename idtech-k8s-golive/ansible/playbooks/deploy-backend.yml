@@ -1,0 +1,20 @@
+- name: Deploy Backend Application
+  hosts: k8s_master
+  become: true
+
+  vars:
+    ansible_python_interpreter: /opt/ansible-k8s-venv/bin/python
+    kubeconfig_path: /etc/kubernetes/admin.conf
+
+  tasks:
+    - name: Deploy Backend Service
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition: "{{ lookup('file', '../../k8s/backend/backend-service.yaml') | from_yaml }}"
+
+    - name: Deploy Backend
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_path }}"
+        definition: "{{ lookup('file', '../../k8s/backend/backend-deployment.yaml') | from_yaml }}"
