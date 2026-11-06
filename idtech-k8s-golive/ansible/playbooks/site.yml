@@ -27,3 +27,7 @@
 - import_playbook: deploy-backend.yml
 
 - import_playbook: deploy-frontend.yml
+
+- import_playbook: install-metrics-server.yml
+
+- import_playbook: deploy-backend-hpa.yml
