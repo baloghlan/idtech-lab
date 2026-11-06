@@ -26,6 +26,33 @@ spec:
       nodeSelector:
         tier: backend
 
+      initContainers:
+        - name: wait-for-redis
+          image: redis:7.4-alpine
+          command:
+            - /bin/sh
+            - -c
+            - |
+              until redis-cli -h "$REDIS_HOST" ping | grep -qx PONG; do
+                echo "Waiting for Redis..."
+                sleep 2
+              done
+          env:
+            - name: REDISCLI_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: REDIS_PASSWORD
+            - name: REDIS_HOST
+              value: redis-headless.idtech-backend.svc.cluster.local
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+
       containers:
         - name: backend
           image: 192.168.56.10:5000/idtech-backend:1.0
