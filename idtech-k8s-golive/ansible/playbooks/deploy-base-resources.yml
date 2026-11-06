@@ -20,14 +20,24 @@
             | list
           }}
 
-    - name: Configure frontend resource quota
+    - name: Configure namespace resource quotas
       kubernetes.core.k8s:
         state: present
         kubeconfig: "{{ kubeconfig_path }}"
-        definition: "{{ lookup('file', manifests_dir + '/resource-quota.yaml') | from_yaml }}"
+        definition: >-
+          {{
+            lookup('file', manifests_dir + '/resource-quota.yaml')
+            | from_yaml_all
+            | list
+          }}
 
-    - name: Configure frontend limit range
+    - name: Configure namespace limit ranges
       kubernetes.core.k8s:
         state: present
         kubeconfig: "{{ kubeconfig_path }}"
-        definition: "{{ lookup('file', manifests_dir + '/limit-range.yaml') | from_yaml }}"
+        definition: >-
+          {{
+            lookup('file', manifests_dir + '/limit-range.yaml')
+            | from_yaml_all
+            | list
+          }}

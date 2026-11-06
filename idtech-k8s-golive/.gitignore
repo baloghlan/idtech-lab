@@ -1,0 +1,17 @@
+# Environment files
+.env
+.env.*
+
+# Private keys and certificate requests
+*.key
+*.csr
+
+# Kubernetes credentials
+kubeconfig*
+*.kubeconfig
+.kube/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/

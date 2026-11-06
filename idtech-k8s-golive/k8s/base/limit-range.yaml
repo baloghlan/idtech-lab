@@ -12,3 +12,18 @@ spec:
       default:
         cpu: 200m
         memory: 128Mi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: backend-limits
+  namespace: idtech-backend
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 50m
+        memory: 64Mi
+      default:
+        cpu: 200m
+        memory: 128Mi

@@ -7,7 +7,7 @@
     ansible_python_interpreter: /opt/ansible-k8s-venv/bin/python
     kubeconfig_path: /etc/kubernetes/admin.conf
     intern_cert_dir: /etc/kubernetes/intern
-    intern_csr_name: intern-client
+    intern_csr_name: idtech-intern-client
 
   tasks:
     - name: Read intern CSR
