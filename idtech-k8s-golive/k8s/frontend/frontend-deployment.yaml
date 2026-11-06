@@ -16,8 +16,15 @@ spec:
         app: frontend
 
     spec:
-      nodeSelector:
-        tier: frontend
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: tier
+                    operator: In
+                    values:
+                      - frontend
 
       tolerations:
         - key: app
