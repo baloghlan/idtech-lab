@@ -6,6 +6,12 @@ metadata:
 spec:
   replicas: 2
 
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+
   selector:
     matchLabels:
       app: frontend
@@ -43,14 +49,14 @@ spec:
 
           readinessProbe:
             httpGet:
-              path: /
+              path: /health
               port: http
             initialDelaySeconds: 3
             periodSeconds: 5
 
           livenessProbe:
             httpGet:
-              path: /
+              path: /health
               port: http
             initialDelaySeconds: 10
             periodSeconds: 10
