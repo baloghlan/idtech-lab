@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: nginx:idtech-invalid-tag
+          image: nginx:1.28-alpine
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
