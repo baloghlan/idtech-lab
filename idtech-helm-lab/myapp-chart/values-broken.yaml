@@ -1,0 +1,6 @@
+replicaCount: 3
+
+image:
+  repository: nginx
+  tag: "idtech-tag-does-not-exist"
+  pullPolicy: Always
