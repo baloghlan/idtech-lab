@@ -1,0 +1,6 @@
+replicaCount: 3
+
+image:
+  repository: httpd
+  tag: "2.4-alpine"
+  pullPolicy: IfNotPresent
