@@ -1,0 +1,1 @@
+apt-get install -y 'filebeat=9.5.7'
